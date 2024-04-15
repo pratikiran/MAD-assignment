@@ -15,7 +15,6 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="Sign Up"
-            app:menu="@menu/top_app_bar"
             app:titleCentered = "true"/>
 
     </com.google.android.material.appbar.AppBarLayout>

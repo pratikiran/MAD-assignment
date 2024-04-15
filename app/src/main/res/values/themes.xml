@@ -6,4 +6,11 @@
     </style>
 
     <style name="Theme.MADProjectAssignment" parent="Base.Theme.MADProjectAssignment" />
+    <style name="Theme.MADProjectAssignment.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="Theme.MADProjectAssignment.AppBarOverlay"
+        parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.MADProjectAssignment.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

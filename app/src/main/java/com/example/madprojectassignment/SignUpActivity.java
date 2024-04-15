@@ -2,29 +2,21 @@ package com.example.madprojectassignment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.color.DynamicColorsOptions;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
-
-import java.util.Objects;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -40,7 +32,7 @@ public class SignUpActivity extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            Intent intent = new Intent(SignUpActivity.this, LogOutActivity.class);
+            Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
             startActivity(intent);
             finish();
         }
@@ -67,9 +59,8 @@ public class SignUpActivity extends AppCompatActivity {
         editTextPassword = (TextInputEditText) layoutEditTextPassword.getEditText();
 
 
-// Inside your onCreate() method after initializing your views
-
-// Name TextWatcher
+        // Inside your onCreate() method after initializing your views
+        // Name TextWatcher
         editTextName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -88,7 +79,7 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
 
-// Username TextWatcher
+        // Username TextWatcher
         editTextUsername.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -107,7 +98,7 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
 
-// Password TextWatcher
+        // Password TextWatcher
         editTextPassword.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -130,70 +121,63 @@ public class SignUpActivity extends AppCompatActivity {
         buttonSignUp = findViewById(R.id.signUpButton);
         mAuth = FirebaseAuth.getInstance();
 
-        buttonSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Reset errors on every submit attempt
-                layoutEditTextName.setError(null);
-                layoutEditTextUsername.setError(null);
-                layoutEditTextPassword.setError(null);
+        buttonSignUp.setOnClickListener(v -> {
+            // Reset errors on every submit attempt
+            layoutEditTextName.setError(null);
+            layoutEditTextUsername.setError(null);
+            layoutEditTextPassword.setError(null);
 
-                String name, username, password;
-                name = editTextName.getText() != null ? editTextName.getText().toString() : "";
-                username = editTextUsername.getText() != null ? editTextUsername.getText().toString() : "";
-                password = editTextPassword.getText() != null ? editTextPassword.getText().toString() : "";
+            String name, username, password;
+            name = editTextName.getText() != null ? editTextName.getText().toString() : "";
+            username = editTextUsername.getText() != null ? editTextUsername.getText().toString() : "";
+            password = editTextPassword.getText() != null ? editTextPassword.getText().toString() : "";
 
-                boolean isValid = true;
+            boolean isValid = true;
 
-                if (name.isEmpty()) {
-                    layoutEditTextName.setErrorEnabled(true);
-                    layoutEditTextName.setError("Name cannot be empty");
-                    isValid = false;
-                }
-                if (username.isEmpty()) {
-                    layoutEditTextUsername.setErrorEnabled(true);
-                    layoutEditTextUsername.setError("Username cannot be empty");
-                    isValid = false;
-                }
-                if (password.isEmpty()) {
-                    layoutEditTextPassword.setErrorEnabled(true);
-                    layoutEditTextPassword.setError("Password cannot be empty");
-                    isValid = false;
-                }
+            if (name.isEmpty()) {
+                layoutEditTextName.setErrorEnabled(true);
+                layoutEditTextName.setError("Name cannot be empty");
+                isValid = false;
+            }
+            if (username.isEmpty()) {
+                layoutEditTextUsername.setErrorEnabled(true);
+                layoutEditTextUsername.setError("Email cannot be empty");
+                isValid = false;
+            }
+            if (password.isEmpty()) {
+                layoutEditTextPassword.setErrorEnabled(true);
+                layoutEditTextPassword.setError("Password cannot be empty");
+                isValid = false;
+            }
 
-                if (isValid) {
-                    mAuth.createUserWithEmailAndPassword(username, password)
-                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        // Sign in success, update UI with the signed-in user's information
-                                        FirebaseUser user = mAuth.getCurrentUser();
-                                        Toast.makeText(SignUpActivity.this, "Account Created.",
-                                                Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(SignUpActivity.this, LogOutActivity.class);
-                                        startActivity(intent);
-                                        finish();
-                                    } else {
-                                        if (task.getException() instanceof FirebaseAuthWeakPasswordException) {
-                                            layoutEditTextPassword.setErrorEnabled(true);
-                                            layoutEditTextPassword.setError("Password is too weak. It must have at least 6 characters.");
-                                        } else if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                            layoutEditTextUsername.setErrorEnabled(true);
-                                            layoutEditTextUsername.setError("Invalid email format.");
-                                        } else if (task.getException() instanceof FirebaseAuthUserCollisionException) {
-                                            layoutEditTextUsername.setErrorEnabled(true);
-                                            layoutEditTextUsername.setError("An account already exists with this email.");
-                                        } else if (task.getException() instanceof FirebaseAuthInvalidUserException) {
-                                            layoutEditTextUsername.setErrorEnabled(true);
-                                            layoutEditTextUsername.setError("No user found with this email or user has been disabled.");
-                                        }
-                                        String errorMessage = "Authentication failed.";
-                                        Toast.makeText(SignUpActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
-                                    }
+            if (isValid) {
+                mAuth.createUserWithEmailAndPassword(username, password)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Toast.makeText(SignUpActivity.this, "Account Created.",
+                                        Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                if (task.getException() instanceof FirebaseAuthWeakPasswordException) {
+                                    layoutEditTextPassword.setErrorEnabled(true);
+                                    layoutEditTextPassword.setError("Password is too weak. It must have at least 6 characters.");
+                                } else if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                                    layoutEditTextUsername.setErrorEnabled(true);
+                                    layoutEditTextUsername.setError("Invalid email format.");
+                                } else if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                                    layoutEditTextUsername.setErrorEnabled(true);
+                                    layoutEditTextUsername.setError("An account already exists with this email.");
+                                } else if (task.getException() instanceof FirebaseAuthInvalidUserException) {
+                                    layoutEditTextUsername.setErrorEnabled(true);
+                                    layoutEditTextUsername.setError("No user found with this email or user has been disabled.");
                                 }
-                            });
-                }
+                                String errorMessage = "Authentication failed.";
+                                Toast.makeText(SignUpActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
     }

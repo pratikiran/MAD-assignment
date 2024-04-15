@@ -4,20 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.color.DynamicColorsOptions;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
@@ -37,7 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            Intent intent = new Intent(LoginActivity.this, LogOutActivity.class);
+            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
             startActivity(intent);
             finish();
         }
@@ -102,70 +95,58 @@ public class LoginActivity extends AppCompatActivity {
         buttonForgotPassword = findViewById(R.id.forgotPassButton);
         mAuth = FirebaseAuth.getInstance();
 
-        buttonLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Reset errors on every submit attempt
-                layoutEditTextUsername.setError(null);
-                layoutEditTextPassword.setError(null);
+        buttonLogin.setOnClickListener(v -> {
+            // Reset errors on every submit attempt
+            layoutEditTextUsername.setError(null);
+            layoutEditTextPassword.setError(null);
 
-                String username, password;
-                username = editTextUsername.getText() != null ? editTextUsername.getText().toString() : "";
-                password = editTextPassword.getText() != null ? editTextPassword.getText().toString() : "";
+            String username, password;
+            username = editTextUsername.getText() != null ? editTextUsername.getText().toString() : "";
+            password = editTextPassword.getText() != null ? editTextPassword.getText().toString() : "";
 
-                boolean isValid = true;
+            boolean isValid = true;
 
-                if (username.isEmpty()) {
-                    layoutEditTextUsername.setErrorEnabled(true);
-                    layoutEditTextUsername.setError("Username cannot be empty");
-                    isValid = false;
-                }
-                if (password.isEmpty()) {
-                    layoutEditTextPassword.setErrorEnabled(true);
-                    layoutEditTextPassword.setError("Password cannot be empty");
-                    isValid = false;
-                }
+            if (username.isEmpty()) {
+                layoutEditTextUsername.setErrorEnabled(true);
+                layoutEditTextUsername.setError("Email cannot be empty");
+                isValid = false;
+            }
+            if (password.isEmpty()) {
+                layoutEditTextPassword.setErrorEnabled(true);
+                layoutEditTextPassword.setError("Password cannot be empty");
+                isValid = false;
+            }
 
-                if (isValid) {
-                    mAuth.signInWithEmailAndPassword(username, password)
-                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        // Sign in success, update UI with the signed-in user's information
-                                        FirebaseUser user = mAuth.getCurrentUser();
-                                        Intent intent = new Intent(LoginActivity.this, LogOutActivity.class);
-                                        startActivity(intent);
-                                        finish();
-                                    } else {
-                                        // If sign in fails, display a message to the user based on the specific exception
-                                        if (task.getException() instanceof FirebaseAuthInvalidUserException) {
-                                            // This means the email does not exist in the system
-                                            layoutEditTextUsername.setErrorEnabled(true);
-                                            layoutEditTextUsername.setError("No user found with this email. Please sign up first.");
-                                        } else if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                            // This can mean the password is wrong or the email format is invalid, generally used for wrong password
-                                            layoutEditTextPassword.setErrorEnabled(true);
-                                            layoutEditTextPassword.setError("The password is incorrect.");
-                                            layoutEditTextUsername.setErrorEnabled(true);
-                                            layoutEditTextUsername.setError("The email format is invalid.");
-                                        }  else {
-                                            // General authentication failure message
-                                            Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
+            if (isValid) {
+                mAuth.signInWithEmailAndPassword(username, password)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                // If sign in fails, display a message to the user based on the specific exception
+                                if (task.getException() instanceof FirebaseAuthInvalidUserException) {
+                                    // This means the email does not exist in the system
+                                    layoutEditTextUsername.setErrorEnabled(true);
+                                    layoutEditTextUsername.setError("No user found with this email. Please sign up first.");
+                                } else if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                                    // This can mean the password is wrong or the email format is invalid, generally used for wrong password
+                                    layoutEditTextPassword.setErrorEnabled(true);
+                                    layoutEditTextPassword.setError("The password is incorrect.");
+                                    layoutEditTextUsername.setErrorEnabled(true);
+                                    layoutEditTextUsername.setError("The email format is invalid.");
+                                }  else {
+                                    // General authentication failure message
+                                    Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                                 }
-                            });
-                }
+                            }
+                        });
             }
         });
 
 
-        buttonForgotPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(LoginActivity.this, "Not Implemented Yet.", Toast.LENGTH_SHORT).show();
-            }
-        });
+        buttonForgotPassword.setOnClickListener(v -> Toast.makeText(LoginActivity.this, "Not Implemented Yet.", Toast.LENGTH_SHORT).show());
     }
 }
